@@ -179,7 +179,7 @@ def facebook_post_info(username):
         print("\033[31mError fetching Facebook posts:\033[0m", e)
 
 def open_help():
-    os.system("termux-open-url https://github.com/ovi")
+    os.system("termux-open-url https://www.facebook.com/cyberghostxovihackeroffpower")
 
 def options_menu(username):
     print("\033[36mCurrent Instagram username: \033[0m \033[37m{}\033[0m \n".format(username))
