@@ -8,6 +8,7 @@ import getpass
 import requests
 from bs4 import BeautifulSoup
 import json
+import shutil
 
 # Instagram
 try:
@@ -27,6 +28,7 @@ except ImportError:
 try:
     from selenium import webdriver
     from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.chrome.service import Service
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
@@ -190,7 +192,7 @@ def instagram_download_posts(username):
 
 # ----------------- Selenium Facebook Functions (Advanced) -----------------
 def setup_driver():
-    """Configure Chrome driver for headless mode in Termux."""
+    """Configure Chrome driver for headless mode in Termux with explicit chromedriver path."""
     options = Options()
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
@@ -199,7 +201,14 @@ def setup_driver():
     options.add_argument("--window-size=1920x1080")
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_argument("user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
-    driver = webdriver.Chrome(options=options)
+    
+    # Find chromedriver path
+    chromedriver_path = shutil.which("chromedriver")
+    if chromedriver_path is None:
+        raise Exception("chromedriver not found in PATH. Please install it: pkg install chromedriver")
+    
+    service = Service(executable_path=chromedriver_path)
+    driver = webdriver.Chrome(service=service, options=options)
     return driver
 
 def extract_about_section(driver):
