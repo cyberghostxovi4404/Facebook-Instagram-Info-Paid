@@ -24,7 +24,7 @@ try:
 except ImportError:
     FACEBOOK_SCRAPER_AVAILABLE = False
 
-# Selenium for advanced Facebook scraping
+# Selenium
 try:
     from selenium import webdriver
     from selenium.webdriver.chrome.options import Options
@@ -32,7 +32,7 @@ try:
     from selenium.webdriver.common.by import By
     from selenium.webdriver.support.ui import WebDriverWait
     from selenium.webdriver.support import expected_conditions as EC
-    from selenium.common.exceptions import TimeoutException, NoSuchElementException
+    from selenium.common.exceptions import TimeoutException
     SELENIUM_AVAILABLE = True
 except ImportError:
     SELENIUM_AVAILABLE = False
@@ -72,7 +72,7 @@ def banner():
 \033[1;36m  +===============================================+
 \033[1;37m     [ \033[1;31m• \033[1;37m] \033[1;36mCEO    \033[1;31m: \033[1;91mOVI (CYBER GHOST X)
 \033[1;37m     [ \033[1;31m• \033[1;37m] \033[1;36mTEAM   \033[1;31m: \033[1;97mCYBER GHOST X OVI
-\033[1;37m     [ \033[1;31m• \033[1;37m] \033[1;36mTOOL   \033[1;31m: \033[1;92mFacebook Instagram Info (Selenium Enhanced)
+\033[1;37m     [ \033[1;31m• \033[1;37m] \033[1;36mTOOL   \033[1;31m: \033[1;92mFacebook Instagram Info (Final Fix)
 \033[1;37m     [ \033[1;31m• \033[1;37m] \033[1;36mSTATUS \033[1;31m: \033[1;93mPAID ACCESS GRANTED
 \033[1;36m  +===============================================+\033[0m
 """)
@@ -99,7 +99,6 @@ def instagram_profile_info(username):
         return
 
     L = instaloader.Instaloader()
-    # Optional login to avoid rate limits
     login_choice = input("Login to Instagram? (y/n, default n): ").strip().lower()
     if login_choice == 'y':
         ig_user = input("Instagram username: ").strip()
@@ -190,9 +189,8 @@ def instagram_download_posts(username):
     except Exception as e:
         print_colored(f"Error: {e}", "1;31")
 
-# ----------------- Selenium Facebook Functions (Advanced) -----------------
+# ----------------- Selenium Facebook Functions -----------------
 def setup_driver():
-    """Configure Chrome driver for headless mode in Termux with explicit chromedriver path."""
     options = Options()
     options.add_argument("--headless")
     options.add_argument("--no-sandbox")
@@ -202,17 +200,15 @@ def setup_driver():
     options.add_argument("--disable-blink-features=AutomationControlled")
     options.add_argument("user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
     
-    # Find chromedriver path
     chromedriver_path = shutil.which("chromedriver")
     if chromedriver_path is None:
-        raise Exception("chromedriver not found in PATH. Please install it: pkg install chromedriver")
+        raise Exception("chromedriver not found. Install: pkg install chromedriver")
     
     service = Service(executable_path=chromedriver_path)
     driver = webdriver.Chrome(service=service, options=options)
     return driver
 
 def extract_about_section(driver):
-    """Extract information from the 'About' page."""
     about_info = {}
     try:
         about_link = WebDriverWait(driver, 10).until(
@@ -246,9 +242,8 @@ def extract_about_section(driver):
     return about_info
 
 def selenium_facebook_scraper(profile_url):
-    """Main Selenium scraper function."""
     if not SELENIUM_AVAILABLE:
-        return {"Error": "Selenium not installed. Install with: pip install selenium"}
+        return {"Error": "Selenium not installed. Install: pip install selenium"}
     driver = None
     try:
         driver = setup_driver()
@@ -297,9 +292,8 @@ def selenium_facebook_scraper(profile_url):
             driver.quit()
     return info
 
-# ----------------- Facebook Functions (Combined) -----------------
+# ----------------- Facebook Simple Fallback -----------------
 def facebook_simple_info(profile_id):
-    """Fallback: fetch name and profile pic using requests."""
     url = f"https://www.facebook.com/{profile_id}"
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
     try:
@@ -316,10 +310,9 @@ def facebook_simple_info(profile_id):
         return None, str(e)
 
 def facebook_profile_info(identifier):
-    """Enhanced Facebook profile info using multiple methods."""
     print_colored("\n[ Facebook Profile Information ]\n", "1;33")
 
-    # Method 1: Try facebook-scraper
+    # Method 1: facebook-scraper
     if FACEBOOK_SCRAPER_AVAILABLE:
         try:
             profile = get_profile(identifier)
@@ -345,7 +338,7 @@ def facebook_profile_info(identifier):
     else:
         print_colored(f"Fallback failed: {err}. Trying Selenium...", "1;33")
 
-    # Method 3: Selenium for deeper scraping
+    # Method 3: Selenium
     url = f"https://www.facebook.com/{identifier}" if not identifier.startswith("http") else identifier
     selenium_data = selenium_facebook_scraper(url)
     if "Error" not in selenium_data:
